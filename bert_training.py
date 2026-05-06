@@ -83,10 +83,10 @@ probabilities_of_one = probs[:, 1].numpy()
 
 # save in legacy format (.tsv with no header)
 # evaluate_bert.py expects a single column of probabilities
-os.makedirs("BERT_CLASSIFIER_DIR", exist_ok=True)
+os.makedirs("billsum_bert_results", exist_ok=True)
 
 pd.DataFrame(probabilities_of_one).to_csv(
-    "BERT_CLASSIFIER_DIR/us_test_results.tsv", 
+    "billsum_bert_results/us_test_results.tsv", 
     sep='\t', 
     index=False, 
     header=False
