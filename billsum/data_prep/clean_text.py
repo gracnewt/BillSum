@@ -136,8 +136,3 @@ if __name__ == '__main__':
         save_path = os.path.join(prefix, 'clean_final', file)
 
         data.to_json(save_path, lines=True, orient='records')
-
-
-
-
-

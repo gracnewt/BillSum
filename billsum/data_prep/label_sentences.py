@@ -8,14 +8,14 @@ import re
 from rouge import Rouge
 import spacy
 
-nlp = spacy.load('en')
+nlp = spacy.load('en_core_web_sm')
 rouge = Rouge()
 
 section_pattern = re.compile('(SECTION)|(Sec)|(Section) [0-9]+')
 
 
 def spacy_to_tuple(doc):
-    text_feats = [(w.string, w.i, w.lemma_, w.ent_type_, w.ent_iob_, w.pos_, w.dep_, w.head.i)
+    text_feats = [(w.text, w.i, w.lemma_, w.ent_type_, w.ent_iob_, w.pos_, w.dep_, w.head.i)
                                     for w in doc]
     return text_feats
 
@@ -94,12 +94,12 @@ def prepare_labels(bill_data,  min_sent_words=5):
                 text_feats = spacy_to_tuple(sent)
             
                 # Create rouge scores                  
-                if len(sent.string) == 0 or len(bill['clean_summary']) == 0:
+                if len(sent.text) == 0 or len(bill['clean_summary']) == 0:
                     continue
                 
-                rscores = rouge.get_scores([sent.string],[bill['clean_summary']])[0]
+                rscores = rouge.get_scores([sent.text],[bill['clean_summary']])[0]
 
-                sent_data.append((sent.string, text_feats, rscores))
+                sent_data.append((sent.text, text_feats, rscores))
 
 
         final_scores[bill_id] = sent_data
