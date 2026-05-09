@@ -1,10 +1,9 @@
 #!/bin/bash
 #SBATCH --job-name=BSBert
-#SBATCH --output=result.out
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:1        # Request a GPU for your BERT model
 #SBATCH --mem=32G
-#SBATCH --nodelist=student-gpu-002
+#SBATCH --nodelist=student-gpu-003
 
 # 1. Force the correct environment
 source /home/gracenewton/miniconda3/etc/profile.d/conda.sh
