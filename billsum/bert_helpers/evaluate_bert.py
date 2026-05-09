@@ -14,7 +14,7 @@ prefix = os.environ['BILLSUM_PREFIX']
 # Load in predictions
 
 prefix_classifier = os.path.join(prefix, 'score_data')
-bert_score_dir = os.path('billsum_bert_results/')
+bert_score_dir = 'billsum_bert_results/'
 model = 'full2'
 
 
