@@ -61,9 +61,9 @@ def extract_all_metrics(filepath):
                 'RL-F': metrics['rouge-l']['f'] * 100,
             }
             # Safely extract BERTScore
-            raw_val = metrics.get('bertscore-f', metrics.get('bert_score_f'))
-            if raw_val is not None:
-                row['BERTScore F1'] = raw_val * 100 if raw_val < 1.0 else raw_val
+            bs_val = metrics.get('bertscore-f', metrics.get('bert_score_f', None))
+            if bs_val is not None:
+                row['BS-F'] = bs_val * 100
             else:
                 row['BS-F'] = None
                 
@@ -94,7 +94,7 @@ if raw_results:
         'ROUGE-1 F1': 'R1-F',
         'ROUGE-2 F1': 'R2-F',
         'ROUGE-L F1': 'RL-F',
-        'BS-F': 'BERTScore F1'
+        'BERTScore F1': 'BS-F'
     }
     
     # Extract only the F1 rows
