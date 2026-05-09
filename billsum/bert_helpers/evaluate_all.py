@@ -88,7 +88,7 @@ def run_evaluation(domain, model):
         all_scores[bill_id]['bertscore-f'] = f1_scores[idx]
 
     # 5. Output metrics pickle
-    output_pkl_path = os.path.join(prefix, 'score_data', f"{domain}_bert_scores_{model}.pkl")
+    output_pkl_path = os.path.join(prefix, 'score_data', f"bs_{domain}_bert_scores_{model}.pkl")
     os.makedirs(os.path.dirname(output_pkl_path), exist_ok=True)
     pickle.dump(all_scores, open(output_pkl_path, 'wb'))
     print(f"Saved evaluation results to: {output_pkl_path}")
