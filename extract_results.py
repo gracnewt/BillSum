@@ -12,7 +12,7 @@ domains = ["us", "ca"]
 models = ["full2", "full2_fast", "fullL", "fullBS"]
 for domain in domains:
     for model in models:
-        files_to_load[f"{domain}_{model}"] = os.path.join(PREFIX, f"bs_{domain}_bert_scores_{model}.pkl"),
+        files_to_load[f"{domain}_{model}"] = os.path.join(PREFIX, f"bs_{domain}_bert_scores_{model}.pkl")
 
 
 def extract_mean_metrics(filepath):
