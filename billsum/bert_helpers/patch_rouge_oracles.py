@@ -43,11 +43,35 @@ def generate_and_evaluate_rouge_oracles(domain):
         if len(human_summary.strip()) == 0 or len(mysents) == 0:
             continue
             
-        # Extract the pre-calculated ROUGE sentence-level scores
-        # Structure of sents: (sentence_text, {rouge-1: F1, rouge-2: F1, rouge-l: F1})
-        # Extract by integer index: s[1][1] is ROUGE-2, s[1][2] is ROUGE-L
-        r2_scores = [s[1][1] for s in sents]
-        rl_scores = [s[1][2] for s in sents]
+        r2_scores = []
+        rl_scores = []
+        
+        # --- DYNAMIC TYPE CHECKING & EXTRACTION ---
+        for s in sents:
+            # Let's inspect 's' to find the numeric metrics
+            numeric_metrics = None
+            for item in s:
+                # If we find a dictionary containing rouge keys
+                if isinstance(item, dict) and ('rouge-2' in item or 'rouge-l' in item):
+                    numeric_metrics = item
+                    break
+                # If we find a list/tuple of floats
+                elif isinstance(item, (list, tuple)) and len(item) >= 3 and all(isinstance(x, (int, float)) for x in item[:3]):
+                    numeric_metrics = item
+                    break
+            
+            if numeric_metrics is not None:
+                if isinstance(numeric_metrics, dict):
+                    r2_scores.append(float(numeric_metrics.get('rouge-2', 0.0)))
+                    rl_scores.append(float(numeric_metrics.get('rouge-l', 0.0)))
+                else: # It's a list/tuple of scores
+                    # Normally: index 0 = ROUGE-1, index 1 = ROUGE-2, index 2 = ROUGE-L
+                    r2_scores.append(float(numeric_metrics[1]))
+                    rl_scores.append(float(numeric_metrics[2]))
+            else:
+                # Fallback if no scores are attached to this sentence
+                r2_scores.append(0.0)
+                rl_scores.append(0.0)
         
         # Build summaries using MMR
         summary_r2 = ' '.join(mmr_selection(mysents, r2_scores))
@@ -65,7 +89,6 @@ def generate_and_evaluate_rouge_oracles(domain):
             else:
                 r_score = rouge.get_scores([human_summary], [summary])[0]
             oracles[key]['scores'][bill_id] = r_score
-
     # 3. Batch run BERTScore on all generated summaries to bypass NaN issues
     for key in ['2', 'L']:
         print(f"Batch evaluating BERTScore for Oracle-{key}...")
