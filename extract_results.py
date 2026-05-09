@@ -10,17 +10,17 @@ pd.set_option('display.float_format', lambda x: f'{x:.2f}')
 
 PREFIX = "/home/gracenewton/nlp_final/BillSum/billsum/data/score_data/"
 
-# Define domains and models
+# Define domains and evaluation structures
 domains = ["us", "ca"]
 
-# Order models so Oracles sit at the "left" edge of the tables, followed by the trained models
-models = ["2", "l", "BS", "full2", "full2_fast", "fullL", "fullBS"]
+# Left edge starts with Oracles, followed by our fine-tuned models
+models = ["oracle_scores_2", "oracle_scores_l", "oracle_scores_BS", "full2", "full2_fast", "fullL", "fullBS"]
 
-# Mapping internal names to your exact requested titles
+# Exact column renaming mapping
 column_mapping = {
-    "2": "OR 2",
-    "l": "L",
-    "BS": "BS",
+    "oracle_scores_2": "Oracle (R2)",
+    "oracle_scores_l": "Oracle (RL)",
+    "oracle_scores_BS": "Oracle (BS)",
     "full2": "Legal-BERT (R2)",
     "full2_fast": "Legal-BERT (R2 Fast)",
     "fullL": "Legal-BERT (RL)",
@@ -30,11 +30,15 @@ column_mapping = {
 files_to_load = {}
 for domain in domains:
     for model in models:
-        # Construct the matching file names
-        files_to_load[f"{domain}_{model}"] = os.path.join(PREFIX, f"bs_{domain}_bert_scores_{model}.pkl")
+        # Construct the matching file names like 'bs_ca_oracle_scores_l.pkl' or 'bs_ca_bert_scores_fullBS.pkl'
+        if "oracle" in model:
+            files_to_load[f"{domain}_{model}"] = os.path.join(PREFIX, f"bs_{domain}_{model}.pkl")
+        else:
+            files_to_load[f"{domain}_{model}"] = os.path.join(PREFIX, f"bs_{domain}_bert_scores_{model}.pkl")
 
 def extract_all_metrics(filepath):
     if not os.path.exists(filepath):
+        # Gracefully handle missing/not-yet-run files
         return None
         
     with open(filepath, 'rb') as f:
@@ -56,7 +60,7 @@ def extract_all_metrics(filepath):
                 'RL-R': metrics['rouge-l']['r'] * 100,
                 'RL-F': metrics['rouge-l']['f'] * 100,
             }
-            # Safely handle BERTScore
+            # Safely extract BERTScore
             bs_val = metrics.get('bertscore-f', metrics.get('bert_score_f', None))
             if bs_val is not None:
                 row['BS-F'] = bs_val * 100
@@ -85,7 +89,7 @@ if raw_results:
     df_all = pd.DataFrame(raw_results)
 
     # 1. GENERATE THE READABLE F1-ONLY TABLE
-    # BERTScore F1 is placed at the very bottom of this dictionary so it sits at the bottom edge of the table
+    # BERTScore F1 sits cleanly at the bottom edge of the table
     f1_metrics = {
         'ROUGE-1 F1': 'R1-F',
         'ROUGE-2 F1': 'R2-F',
@@ -97,7 +101,7 @@ if raw_results:
     df_f1 = df_all.loc[[f1_metrics[k] for k in f1_metrics]]
     df_f1.index = f1_metrics.keys()
     
-    # Split columns by US and CA domain, keeping our custom model ordering
+    # Split columns by US and CA domain, keeping our custom left-edge ordering
     us_cols = [f"us_{m}" for m in models if f"us_{m}" in df_f1.columns]
     ca_cols = [f"ca_{m}" for m in models if f"ca_{m}" in df_f1.columns]
     
@@ -106,26 +110,26 @@ if raw_results:
         base_name = col_name.split('_', 1)[1]
         return column_mapping.get(base_name, base_name)
 
-    print("\n" + "="*115)
+    print("\n" + "="*125)
     print("                      TABLE 1: US DOMAIN F1 SUMMARY")
-    print("="*115)
+    print("="*125)
     us_table = df_f1[us_cols].rename(columns=format_headers)
     print(us_table)
     
-    print("\n" + "="*115)
+    print("\n" + "="*125)
     print("                      TABLE 2: CA DOMAIN F1 SUMMARY")
-    print("="*115)
+    print("="*125)
     ca_table = df_f1[ca_cols].rename(columns=format_headers)
     print(ca_table)
 
     # 2. GENERATE THE COMPREHENSIVE P / R / F GRID
-    print("\n" + "="*115)
+    print("\n" + "="*125)
     print("                 TABLE 3: COMPLETE PRECISION, RECALL & F1 GRID")
-    print("="*115)
+    print("="*125)
     transposed_df = df_all.T
     transposed_df.index = [f"{idx.split('_')[0].upper()} - {column_mapping.get(idx.split('_', 1)[1], idx)}" for idx in transposed_df.index]
     print(transposed_df)
-    print("="*115)
+    print("="*125)
 
 else:
-    print("Error: No evaluation files could be loaded. Ensure the patch run finished successfully.")
+    print("Error: No evaluation files could be loaded. Double-check your pathing: " + PREFIX)
