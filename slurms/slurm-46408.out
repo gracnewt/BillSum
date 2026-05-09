@@ -1,0 +1,20 @@
+Successfully loaded Torch version: 2.6.0+cu124
+Starting BERT Eval...
+
+Evaluating us_test...
+Sentences: 0
+Preds: 145151
+Traceback (most recent call last):
+  File "/home/gracenewton/nlp_final/BillSum/evaluate.py", line 82, in <module>
+    us_scores = evaluate(
+  File "/home/gracenewton/nlp_final/BillSum/evaluate.py", line 75, in evaluate
+    score = rouge.get_scores([final_sum], [reference])[0]
+  File "/home/gracenewton/miniconda3/envs/legal_nlp/lib/python3.10/site-packages/rouge/rouge.py", line 107, in get_scores
+    return self._get_scores(hyps, refs)
+  File "/home/gracenewton/miniconda3/envs/legal_nlp/lib/python3.10/site-packages/rouge/rouge.py", line 120, in _get_scores
+    sc = fn(
+  File "/home/gracenewton/miniconda3/envs/legal_nlp/lib/python3.10/site-packages/rouge/rouge.py", line 53, in <lambda>
+    "rouge-1": lambda hyp, ref, **k: rouge_score.rouge_n(hyp, ref, 1, **k),
+  File "/home/gracenewton/miniconda3/envs/legal_nlp/lib/python3.10/site-packages/rouge/rouge_score.py", line 253, in rouge_n
+    raise ValueError("Hypothesis is empty.")
+ValueError: Hypothesis is empty.

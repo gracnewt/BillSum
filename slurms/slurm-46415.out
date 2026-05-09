@@ -1,0 +1,12 @@
+Successfully loaded Torch version: 2.6.0+cu124
+Starting BERT Eval...
+
+Evaluating Lead-3 on /home/gracenewton/nlp_final/BillSum/billsum/data/sent_data/us_test_sent_scores.pkl
+Evaluated docs: 3269
+
+Evaluating Lead-3 on /home/gracenewton/nlp_final/BillSum/billsum/data/sent_data/ca_test_sent_scores.pkl
+Evaluated docs: 1237
+
+LEAD-3 RESULTS
+US: {'rouge-1': np.float64(0.15171996619556727), 'rouge-2': np.float64(0.06502111246754634), 'rouge-l': np.float64(0.13380636286845737)}
+CA: {'rouge-1': np.float64(0.2531682604878224), 'rouge-2': np.float64(0.10273223331071231), 'rouge-l': np.float64(0.22628767081431567)}

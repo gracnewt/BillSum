@@ -1,0 +1,14 @@
+Successfully loaded Torch version: 2.6.0+cu124
+Starting BERT Eval...
+
+Evaluating us_test...
+
+Evaluating ca_test...
+
+Final Results:
+/home/gracenewton/miniconda3/envs/legal_nlp/lib/python3.10/site-packages/numpy/_core/fromnumeric.py:3860: RuntimeWarning: Mean of empty slice.
+  return _methods._mean(a, axis=axis, dtype=dtype,
+/home/gracenewton/miniconda3/envs/legal_nlp/lib/python3.10/site-packages/numpy/_core/_methods.py:145: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)
+US: {'rouge-1': np.float64(nan), 'rouge-2': np.float64(nan), 'rouge-l': np.float64(nan)}
+CA: {'rouge-1': np.float64(nan), 'rouge-2': np.float64(nan), 'rouge-l': np.float64(nan)}
