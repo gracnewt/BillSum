@@ -107,32 +107,29 @@ def clean_text(text):
 
 
 if __name__ == '__main__':
-
-
     prefix = os.environ['BILLSUM_PREFIX']
     path = os.path.join(prefix, 'data_final')
-
-    # Create dir where data should be saved
-    save_path = os.path.join(prefix, 'clean_final')
-    #os.mkdir(save_path)
+    save_dir = os.path.join(prefix, 'clean_final')
+    
+    # Ensure save directory exists
+    os.makedirs(save_dir, exist_ok=True)
 
     for file in os.listdir(path):
         if '.jsonl' not in file:
             continue
 
-
-        file_path = os.path.join(path,  file)
-
+        file_path = os.path.join(path, file)
         print("Now processing", file_path)
 
         data = pd.read_json(file_path, lines=True)
 
         data['clean_text'] = data.text.map(clean_text)
-        
         data['clean_summary'] = data.summary.map(clean_text)
-
         data['clean_title'] = data.title.map(clean_text)
 
-        save_path = os.path.join(prefix, 'clean_final', file)
-
-        data.to_json(save_path, lines=True, orient='records')
+        # --- NEW LOGIC TO STRIP "_OFFICIAL" ---
+        new_filename = file.replace('_OFFICIAL', '')
+        final_save_path = os.path.join(save_dir, new_filename)
+        
+        print(f"Saving cleaned data to: {final_save_path}")
+        data.to_json(final_save_path, lines=True, orient='records')
