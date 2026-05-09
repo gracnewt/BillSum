@@ -21,5 +21,4 @@ bash ./organize_slurm_output.sh
 #python -u billsum/data_prep/label_sentences.py
 
 echo "Eval BERT..."
-python billsum/bert_helpers/evaluate_bert_fullL.py
-python billsum/bert_helpers/evaluate_bert_full2_fast.py
+python billsum/bert_helpers/evaluate_bert_fullBS.py
