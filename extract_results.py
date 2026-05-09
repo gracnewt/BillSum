@@ -2,25 +2,26 @@ import os
 import pickle
 import pandas as pd
 
-# Define paths to your evaluation pickle files
+# Setup display options so nothing gets truncated in your terminal
+pd.set_option('display.max_columns', None)
+pd.set_option('display.max_rows', None)
+pd.set_option('display.width', 1000)
+pd.set_option('display.float_format', lambda x: f'{x:.2f}')
+
 PREFIX = "/home/gracenewton/nlp_final/BillSum/billsum/data/score_data/"
 
-# Define the models and domains you want to extract
-# This assumes your newly generated files follow the naming convention we set up
-files_to_load = {}
+# Define all system runs and domains
 domains = ["us", "ca"]
-models = ["full2", "full2_fast", "fullL", "fullBS"]
-o_models = ["2", "l", "BS"]
+models = ["full2", "full2_fast", "fullL", "fullBS", "2", "l", "BS"]
+
+files_to_load = {}
 for domain in domains:
     for model in models:
+        # Construct the matching file names
         files_to_load[f"{domain}_{model}"] = os.path.join(PREFIX, f"bs_{domain}_bert_scores_{model}.pkl")
-    for o_model in o_models:
-        files_to_load[f"{domain}_{o_model}"] = os.path.join(PREFIX, f"bs_{domain}_oracle_scores_{o_model}.pkl")
 
-
-def extract_mean_metrics(filepath):
+def extract_all_metrics(filepath):
     if not os.path.exists(filepath):
-        print(f"Warning: File not found at {filepath}")
         return None
         
     with open(filepath, 'rb') as f:
@@ -28,53 +29,81 @@ def extract_mean_metrics(filepath):
     
     rows = []
     for bill_id, metrics in data.items():
-        # Handle cases where some keys might be structured differently
         try:
             row = {
-                'ROUGE-1 F1': metrics['rouge-1']['f'] * 100,
-                'ROUGE-2 F1': metrics['rouge-2']['f'] * 100,
-                'ROUGE-L F1': metrics['rouge-l']['f'] * 100,
+                'R1-P': metrics['rouge-1']['p'] * 100,
+                'R1-R': metrics['rouge-1']['r'] * 100,
+                'R1-F': metrics['rouge-1']['f'] * 100,
+                
+                'R2-P': metrics['rouge-2']['p'] * 100,
+                'R2-R': metrics['rouge-2']['r'] * 100,
+                'R2-F': metrics['rouge-2']['f'] * 100,
+                
+                'RL-P': metrics['rouge-l']['p'] * 100,
+                'RL-R': metrics['rouge-l']['r'] * 100,
+                'RL-F': metrics['rouge-l']['f'] * 100,
             }
-            # Look for the newly added BERTScore metrics
-            if 'bertscore-f' in metrics:
-                row['BERTScore F1'] = metrics['bertscore-f'] * 100
-            elif 'bert_score_f' in metrics:  # Fallback naming check
-                row['BERTScore F1'] = metrics['bert_score_f'] * 100
+            # Safely handle BERTScore
+            bs_val = metrics.get('bertscore-f', metrics.get('bert_score_f', None))
+            if bs_val is not None:
+                row['BS-F'] = bs_val * 100
             else:
-                row['BERTScore F1'] = None
+                row['BS-F'] = None
                 
             rows.append(row)
-        except KeyError as e:
-            # Skip corrupted/unmatched entries if they exist
+        except (KeyError, TypeError):
             continue
             
     if not rows:
-        print(f"Warning: No valid metric structures found in {filepath}")
         return None
         
     df = pd.DataFrame(rows)
     return df.mean()
 
-# Execute extraction
-results = {}
-for model_name, path in files_to_load.items():
-    mean_scores = extract_mean_metrics(path)
-    if mean_scores is not None:
-        results[model_name] = mean_scores
+# Extract data
+raw_results = {}
+for name, path in files_to_load.items():
+    mean_stats = extract_all_metrics(path)
+    if mean_stats is not None:
+        raw_results[name] = mean_stats
 
-# Format output into a combined table
-# Format output into a combined table
-if results:
-    results_df = pd.DataFrame(results).round(2)
+if raw_results:
+    # Build complete DataFrame
+    df_all = pd.DataFrame(raw_results)
+
+    # 1. GENERATE THE READABLE F1-ONLY TABLE
+    f1_metrics = {
+        'ROUGE-1 F1': 'R1-F',
+        'ROUGE-2 F1': 'R2-F',
+        'ROUGE-L F1': 'RL-F',
+        'BERTScore F1': 'BS-F'
+    }
     
-    # --- FORCE PANDAS TO SHOW ALL COLUMNS ---
-    pd.set_option('display.max_columns', None)
-    pd.set_option('display.width', 1000) 
+    # Extract only the F1 rows and clean column names for presentation
+    df_f1 = df_all.loc[[f1_metrics[k] for k in f1_metrics]]
+    df_f1.index = f1_metrics.keys()
     
-    print("\n" + "="*80)
-    print("                         SUMMARY EVALUATION RESULTS")
-    print("="*80)
-    print(results_df)
-    print("="*80)
+    # Split by US and CA for cleaner layout
+    us_cols = [c for c in df_f1.columns if c.startswith('us_')]
+    ca_cols = [c for c in df_f1.columns if c.startswith('ca_')]
+    
+    print("\n" + "="*90)
+    print("                     TABLE 1: US DOMAIN F1 SUMMARY")
+    print("="*90)
+    print(df_f1[us_cols].rename(columns=lambda x: x.replace('us_', '')))
+    
+    print("\n" + "="*90)
+    print("                     TABLE 2: CA DOMAIN F1 SUMMARY")
+    print("="*90)
+    print(df_f1[ca_cols].rename(columns=lambda x: x.replace('ca_', '')))
+
+    # 2. GENERATE THE COMPREHENSIVE P / R / F GRID
+    print("\n" + "="*90)
+    print("                 TABLE 3: COMPLETE PRECISION, RECALL & F1 GRID")
+    print("="*90)
+    # Transposing makes reading long column lists down a page much easier
+    print(df_all.T)
+    print("="*90)
+
 else:
-    print("No evaluation files were successfully loaded.")
+    print("Error: No evaluation files could be loaded. Double-check your patch execution!")
