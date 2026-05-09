@@ -72,7 +72,7 @@ training_args = TrainingArguments(
     load_best_model_at_end=True,
     push_to_hub=False,
     report_to="none",
-    f16=True
+    fp16=True
 )
 
 trainer = Trainer(
