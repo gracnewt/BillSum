@@ -35,6 +35,7 @@ def generate_and_evaluate_rouge_oracles(domain):
     }
     
     # 2. Build the Oracle Summaries using MMR over ROUGE-2 and ROUGE-L sentence scores
+    # 2. Build the Oracle Summaries using MMR over ROUGE-2 and ROUGE-L sentence scores
     for bill_id in doc_order:
         sents = sent_data[bill_id]
         mysents = [s[0] for s in sents]
@@ -46,30 +47,31 @@ def generate_and_evaluate_rouge_oracles(domain):
         r2_scores = []
         rl_scores = []
         
-        # --- DYNAMIC TYPE CHECKING & EXTRACTION ---
+        # --- TYPE-SAFE DICTIONARY MATCHING ---
         for s in sents:
-            # Let's inspect 's' to find the numeric metrics
             numeric_metrics = None
             for item in s:
-                # If we find a dictionary containing rouge keys
                 if isinstance(item, dict) and ('rouge-2' in item or 'rouge-l' in item):
-                    numeric_metrics = item
-                    break
-                # If we find a list/tuple of floats
-                elif isinstance(item, (list, tuple)) and len(item) >= 3 and all(isinstance(x, (int, float)) for x in item[:3]):
                     numeric_metrics = item
                     break
             
             if numeric_metrics is not None:
-                if isinstance(numeric_metrics, dict):
-                    r2_scores.append(float(numeric_metrics.get('rouge-2', 0.0)))
-                    rl_scores.append(float(numeric_metrics.get('rouge-l', 0.0)))
-                else: # It's a list/tuple of scores
-                    # Normally: index 0 = ROUGE-1, index 1 = ROUGE-2, index 2 = ROUGE-L
-                    r2_scores.append(float(numeric_metrics[1]))
-                    rl_scores.append(float(numeric_metrics[2]))
+                # Extract the 'f' key from the nested metrics dictionary
+                r2_data = numeric_metrics.get('rouge-2', 0.0)
+                rl_data = numeric_metrics.get('rouge-l', 0.0)
+                
+                # If it's a nested dictionary (e.g., {'f': 0.35, 'p': 0.3, 'r': 0.4})
+                if isinstance(r2_data, dict):
+                    r2_scores.append(float(r2_data.get('f', 0.0)))
+                else:
+                    r2_scores.append(float(r2_data))
+                    
+                if isinstance(rl_data, dict):
+                    rl_scores.append(float(rl_data.get('f', 0.0)))
+                else:
+                    rl_scores.append(float(rl_data))
             else:
-                # Fallback if no scores are attached to this sentence
+                # Safe fallback
                 r2_scores.append(0.0)
                 rl_scores.append(0.0)
         
