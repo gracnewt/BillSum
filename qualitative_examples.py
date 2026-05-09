@@ -15,7 +15,7 @@ def extract_summaries(domain):
     if domain == 'us':
         domain_corrected_test_results = f"test_results.tsv_{model}"
     else:
-        domain_corrected_test_results = f"{domain}_test_results.tsv_{model}"
+        domain_corrected_test_results = f"{domain}_test_results_{model}.tsv"
     predictions = pd.read_csv(os.path.join('billsum_bert_results', domain_corrected_test_results), sep='\t', header=None)
     pos_pred = predictions[1].values if predictions.shape[1] > 1 else predictions[0].values
     
