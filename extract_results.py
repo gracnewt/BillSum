@@ -10,9 +10,12 @@ PREFIX = "/home/gracenewton/nlp_final/BillSum/billsum/data/score_data/"
 files_to_load = {}
 domains = ["us", "ca"]
 models = ["full2", "full2_fast", "fullL", "fullBS"]
+o_models = ["2", "l", "BS"]
 for domain in domains:
     for model in models:
         files_to_load[f"{domain}_{model}"] = os.path.join(PREFIX, f"bs_{domain}_bert_scores_{model}.pkl")
+    for o_model in o_models:
+        files_to_load[f"{domain}_{o_model}"] = os.path.join(PREFIX, f"{domain}_oracle_scores_{o_model}.pkl")
 
 
 def extract_mean_metrics(filepath):
