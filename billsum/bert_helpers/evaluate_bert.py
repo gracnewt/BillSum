@@ -13,12 +13,14 @@ prefix = os.environ['BILLSUM_PREFIX']
 
 # Load in predictions
 
-prefix_classifier = os.path.join(prefix, 'bert_data')
+prefix_classifier = os.path.join(prefix, 'score_data')
+bert_score_dir = os.path('billsum_bert_results/')
+model = 'full2'
 
 
 ############## US ####################
 
-predictions = pd.read_csv(os.path.join(prefix_classifier,'us_test_results.tsv'), sep='\t', header=None)
+predictions = pd.read_csv(os.path.join(bert_score_dir,f"us_test_results_{model}.tsv"), sep='\t', header=None)
 pos_pred = predictions[1].values
 
 
@@ -26,7 +28,7 @@ pos_pred = predictions[1].values
 
 sent_data = pickle.load(open(prefix + 'sent_data/us_test_sent_scores.pkl', 'rb'))
 
-docs = pd.read_json(prefix + 'clean_final/us_test_data_final.jsonl', lines=True)
+docs = pd.read_json(prefix + 'clean_final/us_test_data_final_OFFICIAL.jsonl', lines=True)
 docs.set_index('bill_id', inplace=True)
 
 
@@ -54,12 +56,12 @@ for bill_id in doc_order:
     all_scores[bill_id] = score
     #rint(score)
 
-pickle.dump(all_scores, open(os.path.join(prefix, 'score_data/us_bert_scores.pkl'), 'wb'))
+pickle.dump(all_scores, open(os.path.join(prefix, f"score_data/us_bert_scores_{model}.pkl"), 'wb'))
 
 
 ############## CA ####################
 
-predictions = pd.read_csv(os.path.join(prefix_classifier,'ca_test_results.tsv'), sep='\t', header=None)
+predictions = pd.read_csv(os.path.join(prefix_classifier,'ca_test_results_{model}.tsv'), sep='\t', header=None)
 pos_pred = predictions[1].values
 
 
@@ -67,7 +69,7 @@ pos_pred = predictions[1].values
 
 sent_data = pickle.load(open(prefix + 'sent_data/ca_test_sent_scores.pkl', 'rb'))
 
-docs = pd.read_json(prefix + 'clean_final/ca_test_data_final.jsonl', lines=True)
+docs = pd.read_json(prefix + 'clean_final/ca_test_data_final_OFFICIAL.jsonl', lines=True)
 docs.set_index('bill_id', inplace=True)
 
 
@@ -94,5 +96,4 @@ for bill_id in doc_order:
     score = rouge.get_scores([docs.loc[bill_id].clean_summary], [final_sum])[0]
     all_scores[bill_id] = score
 
-pickle.dump(all_scores, open(os.path.join(prefix, 'score_data/ca_bert_scores.pkl'), 'wb'))
-
+pickle.dump(all_scores, open(os.path.join(prefix, f"score_data/ca_bert_scores_{model}.pkl"), 'wb'))
