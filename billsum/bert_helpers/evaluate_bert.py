@@ -20,7 +20,7 @@ model = 'full2'
 
 ############## US ####################
 
-predictions = pd.read_csv(os.path.join(bert_score_dir,f"us_test_results_{model}.tsv"), sep='\t', header=None)
+predictions = pd.read_csv(os.path.join(bert_score_dir,f"test_results_{model}.tsv"), sep='\t', header=None)
 pos_pred = predictions[1].values
 
 
