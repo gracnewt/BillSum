@@ -20,5 +20,5 @@ bash ./organize_slurm_output.sh
 #echo "Starting Sentence Labeling..."
 #python -u billsum/data_prep/label_sentences.py
 
-echo "Eval BERT..."
-python billsum/bert_helpers/evaluate_bert_fullBS.py
+echo "Eval BERTs..."
+python billsum/bert_helpers/evaluate_all.py
