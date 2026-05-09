@@ -13,7 +13,7 @@ conda activate legal_nlp
 export BILLSUM_PREFIX="/home/gracenewton/nlp_final/BillSum/billsum/data/"
 export PYTHONPATH=$PYTHONPATH:.
 
-
+bash ./organize_slurm_output.sh
 #echo "Starting Clean Text..."
 #python -u billsum/data_prep/clean_text.py
 
@@ -21,7 +21,5 @@ export PYTHONPATH=$PYTHONPATH:.
 #python -u billsum/data_prep/label_sentences.py
 
 echo "Eval BERT..."
-python billsum/bert_helpers/evaluate_bert.py
-echo "Done!"
-
-organize_slurm_output.sh
+python billsum/bert_helpers/evaluate_bert_fullL.py
+python billsum/bert_helpers/evaluate_bert_full2_fast.py
