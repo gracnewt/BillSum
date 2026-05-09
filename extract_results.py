@@ -10,9 +10,20 @@ pd.set_option('display.float_format', lambda x: f'{x:.2f}')
 
 PREFIX = "/home/gracenewton/nlp_final/BillSum/billsum/data/score_data/"
 
-# Define all system runs and domains
+# Define all system runs and domains, prioritizing a logical ordering (models first, then oracles)
 domains = ["us", "ca"]
 models = ["full2", "full2_fast", "fullL", "fullBS", "2", "l", "BS"]
+
+# Mapping internal names to publication-ready column headers
+column_mapping = {
+    "full2": "Legal-BERT (R2)",
+    "full2_fast": "Legal-BERT (R2 Fast)",
+    "fullL": "Legal-BERT (RL)",
+    "fullBS": "Legal-BERT (BS)",
+    "2": "Oracle (ROUGE-2)",
+    "l": "Oracle (ROUGE-L)",
+    "BS": "Oracle (BERTScore)"
+}
 
 files_to_load = {}
 for domain in domains:
@@ -79,31 +90,40 @@ if raw_results:
         'BERTScore F1': 'BS-F'
     }
     
-    # Extract only the F1 rows and clean column names for presentation
+    # Extract only the F1 rows
     df_f1 = df_all.loc[[f1_metrics[k] for k in f1_metrics]]
     df_f1.index = f1_metrics.keys()
     
-    # Split by US and CA for cleaner layout
+    # Split columns by US and CA domain
     us_cols = [c for c in df_f1.columns if c.startswith('us_')]
     ca_cols = [c for c in df_f1.columns if c.startswith('ca_')]
     
-    print("\n" + "="*90)
-    print("                     TABLE 1: US DOMAIN F1 SUMMARY")
-    print("="*90)
-    print(df_f1[us_cols].rename(columns=lambda x: x.replace('us_', '')))
+    # Function to rename headers cleanly
+    def format_headers(col_name):
+        base_name = col_name.split('_', 1)[1]
+        return column_mapping.get(base_name, base_name)
+
+    print("\n" + "="*110)
+    print("                     TABLE 1: US DOMAIN F1 SUMMARY (MODELS & ORACLES)")
+    print("="*110)
+    us_table = df_f1[us_cols].rename(columns=format_headers)
+    print(us_table)
     
-    print("\n" + "="*90)
-    print("                     TABLE 2: CA DOMAIN F1 SUMMARY")
-    print("="*90)
-    print(df_f1[ca_cols].rename(columns=lambda x: x.replace('ca_', '')))
+    print("\n" + "="*110)
+    print("                     TABLE 2: CA DOMAIN F1 SUMMARY (MODELS & ORACLES)")
+    print("="*110)
+    ca_table = df_f1[ca_cols].rename(columns=format_headers)
+    print(ca_table)
 
     # 2. GENERATE THE COMPREHENSIVE P / R / F GRID
-    print("\n" + "="*90)
+    print("\n" + "="*110)
     print("                 TABLE 3: COMPLETE PRECISION, RECALL & F1 GRID")
-    print("="*90)
-    # Transposing makes reading long column lists down a page much easier
-    print(df_all.T)
-    print("="*90)
+    print("="*110)
+    # Map raw names in the full transposed grid too
+    transposed_df = df_all.T
+    transposed_df.index = [f"{idx.split('_')[0].upper()} - {column_mapping.get(idx.split('_', 1)[1], idx)}" for idx in transposed_df.index]
+    print(transposed_df)
+    print("="*110)
 
 else:
-    print("Error: No evaluation files could be loaded. Double-check your patch execution!")
+    print("Error: No evaluation files could be loaded. Ensure 'patch_rouge_oracles.py' has completed running.")
