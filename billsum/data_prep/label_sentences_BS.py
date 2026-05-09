@@ -7,6 +7,8 @@ import pickle
 import re
 from rouge import Rouge
 import spacy
+import torch
+from bert_score import score as bert_scorer
 
 nlp = spacy.load('en_core_web_sm')
 rouge = Rouge()
@@ -45,11 +47,6 @@ def prepare_summary(bill_data):
         final_summary_data[bill_id] = doc_data
 
     return final_summary_data
-
-
-def prepare_labels(bill_data,  min_sent_words=5):
-import torch
-from bert_score import score as bert_scorer
 
 def prepare_labels(bill_data, min_sent_words=5):
     '''
