@@ -30,7 +30,7 @@ def score_oracle_dataset(domain):
         
         # Extract the sentence-level ROUGE scores computed during labeling
         # s[2] contains the ROUGE metric dict. We use ROUGE-2 F1-score as the selector.
-        oracle_ys = [s[2]['rouge-2']['f'] for s in sents]
+        oracle_ys = [s[2]['rouge-l']['f'] for s in sents]
         
         # Construct the Oracle Summary by selecting the best non-redundant sentences
         oracle_summary = ' '.join(mmr_selection(mysents, oracle_ys))
@@ -51,7 +51,7 @@ def score_oracle_dataset(domain):
             print(f"Processed {idx + 1}/{len(doc_order)} documents...")
 
     # 3. Save the Oracle scores to their own pickle files
-    output_path = os.path.join(prefix, 'score_data', f'{domain}_oracle_scores.pkl')
+    output_path = os.path.join(prefix, 'score_data', f'{domain}_oracle_scores_l.pkl')
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     pickle.dump(all_oracle_scores, open(output_path, 'wb'))
     print(f"Successfully saved Oracle scores to: {output_path}\n")

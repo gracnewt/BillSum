@@ -51,7 +51,7 @@ def score_oracle_dataset(domain):
             print(f"Processed {idx + 1}/{len(doc_order)} documents...")
 
     # 3. Save the Oracle scores to their own pickle files
-    output_path = os.path.join(prefix, 'score_data', f'{domain}_oracle_scores.pkl')
+    output_path = os.path.join(prefix, 'score_data', f'{domain}_oracle_scores_2.pkl')
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     pickle.dump(all_oracle_scores, open(output_path, 'wb'))
     print(f"Successfully saved Oracle scores to: {output_path}\n")
