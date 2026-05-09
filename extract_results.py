@@ -89,13 +89,16 @@ if raw_results:
     df_all = pd.DataFrame(raw_results)
 
     # 1. GENERATE THE READABLE F1-ONLY TABLE
-    # BERTScore F1 sits cleanly at the bottom edge of the table
+    # Reversing the mapping so Pandas can find the correct index names in df_all
     f1_metrics = {
-        'ROUGE-1 F1': 'R1-F',
-        'ROUGE-2 F1': 'R2-F',
-        'ROUGE-L F1': 'RL-F',
-        'BERTScore F1': 'BS-F'
+        'R1-F': 'ROUGE-1 F1',
+        'R2-F': 'ROUGE-2 F1',
+        'RL-F': 'ROUGE-L F1',
+        'BS-F': 'BERTScore F1'
     }
+    
+    # Now this line will map correctly and find the rows!
+    df_f1 = df_all.loc[[f1_metrics[k] for k in f1_metrics]]
     
     # Extract only the F1 rows
     df_f1 = df_all.loc[[f1_metrics[k] for k in f1_metrics]]
