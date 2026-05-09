@@ -6,12 +6,17 @@ from billsum.post_process import mmr_selection
 # --- Configuration ---
 prefix = "/home/gracenewton/nlp_final/BillSum/billsum/data/"
 num_examples_to_extract = 3  # How many bills you want to inspect
+model = "full2"
 
 def extract_summaries(domain):
     print(f"--- Extracting {domain.upper()} Examples ---")
     
     # 1. Load data
-    predictions = pd.read_csv(os.path.join(prefix, 'bert_data', f'{domain}_test_results.tsv'), sep='\t', header=None)
+    if domain == 'us':
+        domain_corrected_test_results = f"test_results.tsv_{model}"
+    else:
+        domain_corrected_test_results = f"{domain}_test_results.tsv_{model}"
+    predictions = pd.read_csv(os.path.join('billsum_bert_results', domain_corrected_test_results), sep='\t', header=None)
     pos_pred = predictions[1].values if predictions.shape[1] > 1 else predictions[0].values
     
     sent_data = pickle.load(open(os.path.join(prefix, 'sent_data', f'{domain}_test_sent_scores.pkl'), 'rb'))
