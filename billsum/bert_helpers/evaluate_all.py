@@ -99,6 +99,6 @@ models = ["full2", "full2_fast", "fullL", "fullBS"]
 domains = ["us", "ca"]
 for model in models:
     for domain in domains:
-    run_evaluation(domain, model)
+        run_evaluation(domain, model)
 
 print("\nEvaluation pipeline successfully finished!")
