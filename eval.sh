@@ -22,5 +22,6 @@ export PYTHONPATH=$PYTHONPATH:.
 
 echo "Eval BERT..."
 python billsum/bert_helpers/evaluate_bert.py
+echo "Done!"
 
 organize_slurm_output.sh
