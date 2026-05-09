@@ -19,10 +19,5 @@ export PYTHONPATH=$PYTHONPATH:.
 #echo "Starting Sentence Labeling..."
 #python -u billsum/data_prep/label_sentences.py
 
-echo "Oracle 2"
-python oracle_scores_2.py
-echo "Oracle L"
-python oracle_scores_L.py
-
-
-bash ./organize_slurm_output.sh
+echo "Oracle BS"
+python oracle_scores_BS.py
