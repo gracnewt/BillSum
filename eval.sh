@@ -13,8 +13,6 @@ conda activate legal_nlp
 export BILLSUM_PREFIX="/home/gracenewton/nlp_final/BillSum/billsum/data/"
 export PYTHONPATH=$PYTHONPATH:.
 
-# Stop script if any command fails
-set -e
 
 #echo "Starting Clean Text..."
 #python -u billsum/data_prep/clean_text.py
