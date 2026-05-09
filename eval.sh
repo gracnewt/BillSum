@@ -24,3 +24,5 @@ set -e
 
 echo "Eval BERT..."
 python billsum/bert_helpers/evaluate_bert.py
+
+organize_slurm_output.sh
