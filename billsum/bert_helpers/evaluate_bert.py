@@ -61,7 +61,7 @@ pickle.dump(all_scores, open(os.path.join(prefix, f"score_data/us_bert_scores_{m
 
 ############## CA ####################
 
-predictions = pd.read_csv(os.path.join(prefix_classifier,'ca_test_results_{model}.tsv'), sep='\t', header=None)
+predictions = pd.read_csv(os.path.join(prefix_classifier,f"ca_test_results_{model}.tsv"), sep='\t', header=None)
 pos_pred = predictions[1].values
 
 
