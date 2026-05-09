@@ -45,8 +45,9 @@ def generate_and_evaluate_rouge_oracles(domain):
             
         # Extract the pre-calculated ROUGE sentence-level scores
         # Structure of sents: (sentence_text, {rouge-1: F1, rouge-2: F1, rouge-l: F1})
-        r2_scores = [s[1]['rouge-2'] for s in sents]
-        rl_scores = [s[1]['rouge-l'] for s in sents]
+        # Extract by integer index: s[1][1] is ROUGE-2, s[1][2] is ROUGE-L
+        r2_scores = [s[1][1] for s in sents]
+        rl_scores = [s[1][2] for s in sents]
         
         # Build summaries using MMR
         summary_r2 = ' '.join(mmr_selection(mysents, r2_scores))
