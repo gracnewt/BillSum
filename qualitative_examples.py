@@ -13,7 +13,7 @@ def extract_summaries(domain):
     
     # 1. Load data
     if domain == 'us':
-        domain_corrected_test_results = f"test_results.tsv_{model}"
+        domain_corrected_test_results = f"test_results_{model}.tsv"
     else:
         domain_corrected_test_results = f"{domain}_test_results_{model}.tsv"
     predictions = pd.read_csv(os.path.join('billsum_bert_results', domain_corrected_test_results), sep='\t', header=None)
