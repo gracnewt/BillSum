@@ -60,12 +60,18 @@ for model_name, path in files_to_load.items():
         results[model_name] = mean_scores
 
 # Format output into a combined table
+# Format output into a combined table
 if results:
     results_df = pd.DataFrame(results).round(2)
-    print("\n" + "="*50)
-    print("             SUMMARY EVALUATION RESULTS")
-    print("="*50)
+    
+    # --- FORCE PANDAS TO SHOW ALL COLUMNS ---
+    pd.set_option('display.max_columns', None)
+    pd.set_option('display.width', 1000) 
+    
+    print("\n" + "="*80)
+    print("                         SUMMARY EVALUATION RESULTS")
+    print("="*80)
     print(results_df)
-    print("="*50)
+    print("="*80)
 else:
     print("No evaluation files were successfully loaded.")
